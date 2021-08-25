@@ -7,7 +7,7 @@ import rsaidnumber
 from datetime import timedelta
 
 from flask_cors import CORS
-from flask import Flask, request,jsonify
+from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from flask_jwt import JWT, jwt_required, current_identity
 
@@ -73,7 +73,7 @@ def upload_file():
                       )
     upload_result = None
     if request.method == 'POST' or request.method == 'PUT':
-        image = request.json['image']
+        image = request.files['image']
         app.logger.info('%s file_to_upload', image)
         if image:
             upload_result = cloudinary.uploader.upload(image)
@@ -335,14 +335,11 @@ def edit_product(id):
     try:
         if request.method == 'PUT':
             with sqlite3.connect('practice.db') as conn:
-                title = request.json['title']
-                image = request.json['image']
-                price = request.json['price']
-                type = request.json['type']
+                incoming_data = dict(request.json)
                 put_data = {}
 
-                if title is not None:
-                    put_data['title'] = title
+                if incoming_data.get('title') is not None:
+                    put_data['title'] = incoming_data.get('title')
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET title=? WHERE id=?', (put_data['title'], id))
                     conn.commit()
@@ -350,7 +347,7 @@ def edit_product(id):
                     response['message'] = 'Product Title Updated Successfully'
                     response['status_code'] = 200
 
-                if image is not None:
+                if incoming_data.get('image') is not None:
                     put_data['image'] = upload_file()
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET image=? WHERE id=?',(put_data['image'], id))
@@ -358,16 +355,16 @@ def edit_product(id):
                     response['message'] = 'Product Image Updated Successfully'
                     response['status_code'] = 200
 
-                if price is not None:
-                    put_data['price'] = price
+                if incoming_data.get('price') is not None:
+                    put_data['price'] = incoming_data.get('price')
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET price=? WHERE id=?', (put_data['price'], id))
                     conn.commit()
                     response['message'] = 'Product Price Updated Successfully'
                     response['status_code'] = 200
 
-                if type is not None:
-                    put_data['type'] = type
+                if incoming_data.get('type') is not None:
+                    put_data['type'] = incoming_data.get('type')
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET type=? WHERE id=?',(put_data['type'], id))
                     conn.commit()
