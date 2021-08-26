@@ -201,7 +201,7 @@ def reset(username):
 def show_users():
     response = {}
 
-    with sqlite3.connect("practice.db") as conn:
+    with sqlite3.connect("final.db") as conn:
         cursor = conn.cursor()
         cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM users")
@@ -278,7 +278,7 @@ def view_products():
 def view_product(id):
     response = {}
 
-    with sqlite3.connect('practice.db') as conn:
+    with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM product WHERE id=' + str(id))
 
@@ -294,7 +294,7 @@ def edit_user(user):
     response = {}
 
     if request.method == 'PUT':
-        with sqlite3.connect('practice.db') as conn:
+        with sqlite3.connect('final.db') as conn:
             name = request.json['name']
             surname = request.json['surname']
             email = request.json['email']
@@ -313,43 +313,35 @@ def edit_user(user):
 
             if surname is not None:
                 put_data['surname'] = surname
-
-                with sqlite3.connect('practice.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute('UPDATE users SET surname=? WHERE username=?', (put_data['surname'], user))
-                    conn.commit()
-                    response['message'] = 'User Surname Updated Successfully'
-                    response['status_code'] = 200
+                cursor = conn.cursor()
+                cursor.execute('UPDATE users SET surname=? WHERE username=?', (put_data['surname'], user))
+                conn.commit()
+                response['message'] = 'User Surname Updated Successfully'
+                response['status_code'] = 200
 
             if email is not None:
                 put_data['email'] = email
-
-                with sqlite3.connect('practice.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute('UPDATE users SET email=? WHERE username=?',(put_data['email'], user))
-                    conn.commit()
-                    response['message'] = 'User Email Address Updated Successfully'
-                    response['status_code'] = 200
+                cursor = conn.cursor()
+                cursor.execute('UPDATE users SET email=? WHERE username=?',(put_data['email'], user))
+                conn.commit()
+                response['message'] = 'User Email Address Updated Successfully'
+                response['status_code'] = 200
 
             if username is not None:
                 put_data['username'] = username
-
-                with sqlite3.connect('practice.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute('UPDATE product SET username=? WHERE username=?',(put_data['username'], user))
-                    conn.commit()
-                    response['message'] = 'User Username Updated Successfully'
-                    response['status_code'] = 200
+                cursor = conn.cursor()
+                cursor.execute('UPDATE product SET username=? WHERE username=?',(put_data['username'], user))
+                conn.commit()
+                response['message'] = 'User Username Updated Successfully'
+                response['status_code'] = 200
 
             if password is not None:
                 put_data['password'] = password
-
-                with sqlite3.connect('practice.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute('UPDATE users SET password =? WHERE username=?',(put_data['password'], user))
-                    conn.commit()
-                    response['message'] = 'User Password Updated Successfully'
-                    response['status_code'] = 200
+                cursor = conn.cursor()
+                cursor.execute('UPDATE users SET password =? WHERE username=?',(put_data['password'], user))
+                conn.commit()
+                response['message'] = 'User Password Updated Successfully'
+                response['status_code'] = 200
         return response
 
 
@@ -359,7 +351,7 @@ def edit_product(id):
     response = {}
     try:
         if request.method == 'PUT':
-            with sqlite3.connect('practice.db') as conn:
+            with sqlite3.connect('final.db') as conn:
                 incoming_data = dict(request.json)
                 put_data = {}
 
@@ -408,7 +400,7 @@ def edit_product(id):
 def delete_product(id):
     response = {}
 
-    with sqlite3.connect('practice.db') as conn:
+    with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
         cursor.execute('DELETE FROM product WHERE id=' + str(id))
         conn.commit()
@@ -421,7 +413,7 @@ def delete_product(id):
 def delete_user(username):
     response = {}
 
-    with sqlite3.connect('practice.db') as conn:
+    with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM users WHERE username='" + str(username) +"'")
         conn.commit()
