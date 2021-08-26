@@ -12,16 +12,15 @@ from flask_mail import Mail, Message
 from flask_jwt import JWT, jwt_required, current_identity
 
 
-
 class User(object):
-    def __init__(self,id, username, password):
+    def __init__(self, id, username, password):
         self.id = id
         self.username = username
         self.password = password
 
 
 def users():
-    conn = sqlite3.connect('practice.db')
+    conn = sqlite3.connect('final.db')
     print("Database Ready")
 
     conn.execute("CREATE TABLE IF NOT EXISTS users("
@@ -36,7 +35,7 @@ def users():
 
 
 def products():
-    conn = sqlite3.connect('practice.db')
+    conn = sqlite3.connect('final.db')
     conn.execute("CREATE TABLE IF NOT EXISTS product(id INTEGER PRIMARY KEY AUTOINCREMENT,"
                  "title TEXT NOT NULL,"
                  "image TEXT NOT NULL,"
@@ -47,7 +46,7 @@ def products():
 
 
 def fetch_users():
-    with sqlite3.connect('practice.db') as conn:
+    with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM users')
         customers = cursor.fetchall()
@@ -115,6 +114,30 @@ app.config['CORS_HEADERS'] = ['Content-Type']
 jwt = JWT(app, authenticate, identity)
 
 
+@app.route('/login/', methods=['PATCH'])
+def login():
+    response = {}
+
+    if request.method == 'PATCH':
+        username = request.json['username']
+        password = request.json['password']
+
+        with sqlite3.connect('final.db') as conn:
+            cursor = conn.cursor()
+            cursor.row_factory = sqlite3.Row
+            cursor.execute("SELECT * FROM users WHERE username=? and password=?", (username, password))
+            user = cursor.fetchall()
+            data = []
+
+            for i in user:
+                data.append({u: i[u] for u in i.keys()})
+
+            response['message'] = 'User ' + str(username) + ' retrieved'
+            response['status_code'] = 201
+            response['data'] = data
+        return response
+
+
 @app.route('/register/', methods=['POST'])
 def register():
     response = {}
@@ -130,7 +153,7 @@ def register():
         try:
             regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
             if re.search(regex, email) and rsaidnumber.parse(id_number):
-                with sqlite3.connect('practice.db') as conn:
+                with sqlite3.connect('final.db') as conn:
                     cursor = conn.cursor()
                     cursor.execute('INSERT INTO users('
                                    'name,'
@@ -160,7 +183,7 @@ def reset(username):
     response = {}
 
     if request.method == 'PUT':
-        with sqlite3.connect('practice.db') as conn:
+        with sqlite3.connect('final.db') as conn:
             password = request.json['password']
             put_data = {}
 
@@ -189,16 +212,18 @@ def show_users():
         for i in people:
             data.append({u: i[u] for u in i.keys()})
 
+    response['message'] = 'All Users Found'
+    response['status_code'] = 201
     response['data'] = data
     return jsonify(response)
 
 
-@app.route('/view-user/<int:user_id>', methods=["GET"])
-def view_user(user_id):
+@app.route('/view-user/<username>', methods=["GET"])
+def view_user(username):
     response = {}
-    with sqlite3.connect('practice.db') as conn:
+    with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM register WHERE user_id='" + str(user_id) + "'")
+        cursor.execute("SELECT * FROM user WHERE username='" + str(username) + "'")
         response["status_code"] = 200
         response["description"] = "User retrieved successfully"
         response["data"] = cursor.fetchone()
@@ -216,7 +241,7 @@ def add_product():
         price = request.form['price']
         type = request.form['type']
 
-        with sqlite3.connect('practice.db') as conn:
+        with sqlite3.connect('final.db') as conn:
             cursor = conn.cursor()
             cursor.execute('INSERT INTO product(title,'
                            'image,'
@@ -233,7 +258,7 @@ def add_product():
 def view_products():
     response = {}
 
-    with sqlite3.connect('practice.db') as conn:
+    with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
         cursor.row_factory = sqlite3.Row
         cursor.execute('SELECT * FROM product')
@@ -280,7 +305,7 @@ def edit_user(user):
             if name is not None:
                 put_data['name'] = name
                 cursor = conn.cursor()
-                cursor.execute('UPDATE users SET name=? WHERE username=?',(put_data['name'], user))
+                cursor.execute('UPDATE users SET name=? WHERE username=?', (put_data['name'], user))
                 conn.commit()
 
                 response['message'] = 'User Name Updated Successfully'
@@ -380,7 +405,6 @@ def edit_product(id):
 
 # A Route to delete products
 @app.route('/delete-product/<int:id>')
-# @jwt_required()
 def delete_product(id):
     response = {}
 
