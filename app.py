@@ -44,6 +44,11 @@ def products():
     print('Product Table Ready')
     conn.close()
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 def fetch_users():
     with sqlite3.connect('final.db') as conn:
@@ -123,18 +128,14 @@ def login():
         password = request.json['password']
 
         with sqlite3.connect('final.db') as conn:
+            conn.row_factory = dict_factory
             cursor = conn.cursor()
-            cursor.row_factory = sqlite3.Row
             cursor.execute("SELECT * FROM users WHERE username=? and password=?", (username, password))
-            user = cursor.fetchall()
-            data = []
-
-            for i in user:
-                data.append({u: i[u] for u in i.keys()})
+            user = cursor.fetchone()
 
             response['message'] = 'User ' + str(username) + ' retrieved'
             response['status_code'] = 201
-            response['data'] = data
+            response['data'] = user
         return response
 
 
@@ -202,19 +203,15 @@ def show_users():
     response = {}
 
     with sqlite3.connect("final.db") as conn:
+        conn.row_factory = dict_factory
         cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM users")
 
         people = cursor.fetchall()
-        data = []
-
-        for i in people:
-            data.append({u: i[u] for u in i.keys()})
 
     response['message'] = 'All Users Found'
     response['status_code'] = 201
-    response['data'] = data
+    response['data'] = people
     return jsonify(response)
 
 
@@ -259,17 +256,13 @@ def view_products():
     response = {}
 
     with sqlite3.connect('final.db') as conn:
+        conn.row_factory = dict_factory
         cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
         cursor.execute('SELECT * FROM product')
 
         product = cursor.fetchall()
-        data = []
 
-        for i in product:
-            data.append({u: i[u] for u in i.keys()})
-
-    response['data'] = data
+    response['data'] = product
     return jsonify(response)
 
 
