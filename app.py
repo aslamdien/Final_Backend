@@ -44,21 +44,23 @@ def products():
     print('Product Table Ready')
     conn.close()
 
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
 
+
 def fetch_users():
     with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM users')
-        customers = cursor.fetchall()
+        customer = cursor.fetchall()
 
         all_data = []
 
-        for data in customers:
+        for data in customer:
             all_data.append(User(data[2], data[4], data[5]))
     return all_data
 
@@ -77,7 +79,7 @@ def upload_file():
                       )
     upload_result = None
     if request.method == 'POST' or request.method == 'PUT':
-        image = request.files['image']
+        image = request.json['image']
         app.logger.info('%s file_to_upload', image)
         if image:
             upload_result = cloudinary.uploader.upload(image)
@@ -174,8 +176,10 @@ def register():
                     response['status_code'] = 201
             else:
                 response['message'] = 'Invalid Email Address'
+                response['status_code'] = 401
         except ValueError:
             response['message'] = 'ID Number Invalid'
+            response['status_code'] = 400
     return response
 
 
@@ -233,10 +237,10 @@ def add_product():
     response = {}
 
     if request.method == 'POST':
-        title = request.form['title']
+        title = request.json['title']
         image = upload_file()
-        price = request.form['price']
-        type = request.form['type']
+        price = request.json['price']
+        type = request.json['type']
 
         with sqlite3.connect('final.db') as conn:
             cursor = conn.cursor()
