@@ -402,7 +402,7 @@ def delete_product(id):
 
     with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
-        cursor.execute('DELETE FROM product WHERE id=' + str(id))
+        cursor.execute("DELETE FROM product WHERE id='" + str(id) + "'")
         conn.commit()
         response['status_code'] = 204
         response['message'] = 'Product Has Been Deleted'
@@ -415,7 +415,7 @@ def delete_user(username):
 
     with sqlite3.connect('final.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM users WHERE username='" + str(username) +"'")
+        cursor.execute("DELETE FROM users WHERE username='" + str(username)+"'")
         conn.commit()
         response['status_code'] = 200
         response['message'] = 'User Has Been Deleted'
