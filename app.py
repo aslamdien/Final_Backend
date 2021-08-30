@@ -146,12 +146,12 @@ def register():
     response = {}
 
     if request.method == 'POST':
-        name = request.json['name']
-        surname = request.json['surname']
-        id_number = request.json['id_number']
-        email = request.json['email']
-        username = request.json['username']
-        password = request.json['password']
+        name = request.form['name']
+        surname = request.form['surname']
+        id_number = request.form['id_number']
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
 
         try:
             regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
@@ -179,6 +179,9 @@ def register():
                 response['status_code'] = 401
         except ValueError:
             response['message'] = 'ID Number Invalid'
+            response['status_code'] = 400
+        except sqlite3.IntegrityError:
+            response['message'] = 'This username has been taken'
             response['status_code'] = 400
     return response
 
