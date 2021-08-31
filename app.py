@@ -352,11 +352,14 @@ def edit_product(id):
     try:
         if request.method == 'PUT':
             with sqlite3.connect('final.db') as conn:
-                incoming_data = dict(request.json)
+                title = request.json['title']
+                image = request.json['image']
+                price = request.json['price']
+                type = request.json['type']
                 put_data = {}
 
-                if incoming_data.get('title') is not None:
-                    put_data['title'] = incoming_data.get('title')
+                if title is not None:
+                    put_data['title'] = title
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET title=? WHERE id=?', (put_data['title'], id))
                     conn.commit()
@@ -364,27 +367,29 @@ def edit_product(id):
                     response['message'] = 'Product Title Updated Successfully'
                     response['status_code'] = 200
 
-                if incoming_data.get('image') is not None:
+                if image is not None:
                     put_data['image'] = upload_file()
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET image=? WHERE id=?',(put_data['image'], id))
                     conn.commit()
+
                     response['message'] = 'Product Image Updated Successfully'
                     response['status_code'] = 200
 
-                if incoming_data.get('price') is not None:
-                    put_data['price'] = incoming_data.get('price')
+                if price is not None:
+                    put_data['price'] = price
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET price=? WHERE id=?', (put_data['price'], id))
                     conn.commit()
                     response['message'] = 'Product Price Updated Successfully'
                     response['status_code'] = 200
 
-                if incoming_data.get('type') is not None:
-                    put_data['type'] = incoming_data.get('type')
+                if type is not None:
+                    put_data['type'] = type
                     cursor = conn.cursor()
                     cursor.execute('UPDATE product SET type=? WHERE id=?',(put_data['type'], id))
                     conn.commit()
+
                     response['message'] = 'Product Type Updated Successfully'
                     response['status_code'] = 200
     except ValueError:
