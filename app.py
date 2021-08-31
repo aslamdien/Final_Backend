@@ -349,8 +349,7 @@ def edit_user(user):
 @app.route('/edit-product/<int:id>', methods=['PUT'])
 def edit_product(id):
     response = {}
-    try:
-        if request.method == 'PUT':
+    if request.method == 'PUT':
             with sqlite3.connect('final.db') as conn:
                 title = request.json['title']
                 image = request.json['image']
@@ -367,15 +366,6 @@ def edit_product(id):
                     response['message'] = 'Product Title Updated Successfully'
                     response['status_code'] = 200
 
-                if image is not None:
-                    put_data['image'] = upload_file()
-                    cursor = conn.cursor()
-                    cursor.execute('UPDATE product SET image=? WHERE id=?',(put_data['image'], id))
-                    conn.commit()
-
-                    response['message'] = 'Product Image Updated Successfully'
-                    response['status_code'] = 200
-
                 if price is not None:
                     put_data['price'] = price
                     cursor = conn.cursor()
@@ -387,17 +377,21 @@ def edit_product(id):
                 if type is not None:
                     put_data['type'] = type
                     cursor = conn.cursor()
-                    cursor.execute('UPDATE product SET type=? WHERE id=?',(put_data['type'], id))
+                    cursor.execute('UPDATE product SET type=? WHERE id=?', (put_data['type'], id))
                     conn.commit()
 
                     response['message'] = 'Product Type Updated Successfully'
                     response['status_code'] = 200
-    except ValueError:
-        if request.method != "PUT":
-            response['message'] = 'error method is in correct'
-            response['status_code'] = 400
-    finally:
-        return response
+
+                if image is not None:
+                    put_data['image'] = upload_file()
+                    cursor = conn.cursor()
+                    cursor.execute('UPDATE product SET image=? WHERE id=?', (put_data['image'], id))
+                    conn.commit()
+
+                    response['message'] = 'Product Image Updated Successfully'
+                    response['status_code'] = 200
+            return response
 
 
 # A Route to delete products
