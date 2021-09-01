@@ -9,7 +9,7 @@ from datetime import timedelta
 from flask_cors import CORS
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
-from flask_jwt import JWT, jwt_required, current_identity
+from flask_jwt import JWT
 
 
 class User(object):
@@ -73,9 +73,9 @@ products()
 # function to take image uploads and convert them into urls
 def upload_file():
     app.logger.info('in upload route')
-    cloudinary.config(cloud_name = "dbcczql4w",
-                      api_key = "138784466689969",
-                      api_secret = "Nw8Wv4yVQaFk7I8gu1PHt2OcPxQ"
+    cloudinary.config(cloud_name="dbcczql4w",
+                      api_key="138784466689969",
+                      api_secret="Nw8Wv4yVQaFk7I8gu1PHt2OcPxQ"
                       )
     upload_result = None
     if request.method == 'POST' or request.method == 'PUT':
@@ -322,7 +322,7 @@ def edit_user(user):
             if email is not None:
                 put_data['email'] = email
                 cursor = conn.cursor()
-                cursor.execute('UPDATE users SET email=? WHERE username=?',(put_data['email'], user))
+                cursor.execute('UPDATE users SET email=? WHERE username=?', (put_data['email'], user))
                 conn.commit()
                 response['message'] = 'User Email Address Updated Successfully'
                 response['status_code'] = 200
@@ -330,7 +330,7 @@ def edit_user(user):
             if username is not None:
                 put_data['username'] = username
                 cursor = conn.cursor()
-                cursor.execute('UPDATE product SET username=? WHERE username=?',(put_data['username'], user))
+                cursor.execute('UPDATE product SET username=? WHERE username=?', (put_data['username'], user))
                 conn.commit()
                 response['message'] = 'User Username Updated Successfully'
                 response['status_code'] = 200
@@ -338,7 +338,7 @@ def edit_user(user):
             if password is not None:
                 put_data['password'] = password
                 cursor = conn.cursor()
-                cursor.execute('UPDATE users SET password =? WHERE username=?',(put_data['password'], user))
+                cursor.execute('UPDATE users SET password =? WHERE username=?', (put_data['password'], user))
                 conn.commit()
                 response['message'] = 'User Password Updated Successfully'
                 response['status_code'] = 200
