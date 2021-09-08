@@ -226,8 +226,9 @@ def show_users():
 def view_user(username):
     response = {}
     with sqlite3.connect('final.db') as conn:
+        conn.row_factory = dict_factory
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user WHERE username='" + str(username) + "'")
+        cursor.execute("SELECT * FROM users WHERE username='" + str(username) + "'")
         response["status_code"] = 200
         response["description"] = "User retrieved successfully"
         response["data"] = cursor.fetchone()
